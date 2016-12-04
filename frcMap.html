@@ -1,0 +1,139 @@
+
+<link rel="stylesheet" href="./css/bootstrap.min.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="./css/bootstrap-slider.css" type="text/css" media="screen" />
+
+<script src="./js/jquery.js"></script>
+<script src="./js/bootstrap-slider.js"></script>
+<script src="./js/modernizr.js"></script>
+
+<style>
+
+    /* Always set the map height explicitly to define the size of the div
+     * element that contains the map. */
+    #map {
+      height: 700px;
+      width: 100%;
+    }
+    /* Optional: Makes the sample page fill the window. */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    #floating-panel {
+      position: absolute;
+      top: 10px;
+      left: 25%;
+      z-index: 5;
+      background-color: #fff;
+      padding: 5px;
+      border: 1px solid #999;
+      text-align: center;
+      font-family: 'Roboto','sans-serif';
+      line-height: 30px;
+      padding-left: 10px;
+    }
+
+    .slider-example {
+        margin: auto;
+        margin-left: 200px;
+    }
+
+    .slider.slider-horizontal {
+      width: 610px;
+      height: 20px;
+    }
+    .slider-value {
+        margin-left: 20px;
+    }
+</style>
+
+
+<script type="text/javascript">
+
+function initMap() {
+  var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 4,
+    center: {lat: 42.743, lng: -71.592}
+  });
+  var geocoder = new google.maps.Geocoder();
+
+  document.getElementById('submit').addEventListener('click', function() {
+    geocodeAddress(geocoder, map);
+  });
+  document.getElementById('submit2').addEventListener('click', function() {
+    myMarker.setVisible(false);
+  });
+  document.getElementById('submit3').addEventListener('click', function() {
+    myMarker.setVisible(true);
+  });
+  
+}
+
+var myMarker;
+
+function geocodeAddress(geocoder, resultsMap) {
+  var address = document.getElementById('address').value;
+  geocoder.geocode({'address': address}, function(results, status) {
+    if (status === 'OK') {
+      resultsMap.setCenter(results[0].geometry.location);
+
+      var image = '/Users/ksthilaire/GitHub/ScoutingAppCentral/ScoutingAppData/static/media/images/FIRST-logo-tiny.png';
+      var marker = new google.maps.Marker({
+        map: resultsMap,
+        position: results[0].geometry.location,
+        //icon: image
+      });
+      
+      myMarker = marker;
+      
+      var infoWindow = new google.maps.InfoWindow({
+          content: 'Hello, FRC1073!!!'
+      });
+
+      google.maps.event.addListener(myMarker, 'click', function () {
+            infoWindow.open(map, marker);
+      });
+      
+    } else {
+      alert('Geocode was not successful for the following reason: ' + status);
+    }
+  });
+}
+
+$(document).ready(function() {
+
+    // With JQuery
+    $("#slider").slider();
+    $("#slider").on("slide", function(slideEvt) {
+        $("#sliderSliderVal").text(slideEvt.value);
+    });
+});
+
+
+</script>
+
+<head>
+</head>
+
+<body>
+
+    <div id="floating-panel">
+      <input id="address" type="textbox" value="Hollis, NH">
+      <input id="submit" type="button" value="Geocode">
+      <input id="submit2" type="button" value="Hide">
+      <input id="submit3" type="button" value="Show">
+    </div>
+    <div id="map"></div>
+
+    <div class='slider-example'>
+        <input id="slider" type="text" data-slider-min="1993" data-slider-max="2016" data-slider-step="1" data-slider-value="2016"/>
+        <span class="slider-value" id="sliderCurrentSliderValLabel"> Year: <span id="sliderSliderVal">2016</span></span>
+    </div>
+
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFv2an3D9y6JBSljMqZYS7e8vosnMmdMk&callback=initMap">
+    </script>
+
+</body>
+</html>
