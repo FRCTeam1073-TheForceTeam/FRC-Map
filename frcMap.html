@@ -6,6 +6,10 @@
 <script src="./js/bootstrap-slider.js"></script>
 <script src="./js/modernizr.js"></script>
 
+<script src="./src/dataModel.js"></script>
+<script src="./src/mapInterface.js"></script>
+<script src="./src/mapSlider.js"></script>
+
 <style>
 
     /* Always set the map height explicitly to define the size of the div
@@ -51,62 +55,71 @@
 
 <script type="text/javascript">
 
+var frcInfo;
+
+var toggleTeams = false;
+var toggleEvents = false;
+
 function initMap() {
-  var map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 4,
-    center: {lat: 42.743, lng: -71.592}
-  });
-  var geocoder = new google.maps.Geocoder();
 
-  document.getElementById('submit').addEventListener('click', function() {
-    geocodeAddress(geocoder, map);
-  });
-  document.getElementById('submit2').addEventListener('click', function() {
-    myMarker.setVisible(false);
-  });
-  document.getElementById('submit3').addEventListener('click', function() {
-    myMarker.setVisible(true);
-  });
+    // create the map instance
+    var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 4,
+                center: {lat: 42.743, lng: -71.592}
+            });
+
+    var geocoder = new google.maps.Geocoder();
+
+    // store the map and geocoder in the overall data model object
+    frcInfo.map = map;
+    frcInfo.geocoder = geocoder;
+
+    // create all markers for the FRC teams and events 
+    mapFrcTeams( frcInfo );
+    mapFrcEvents( frcInfo );
+
+    document.getElementById('find_entity').addEventListener('click', function() {
+        var entityName = document.getElementById('entity').value;
+
+        showFrcTeam( frcInfo, entityName );
+    });
+
+    document.getElementById('show_teams').addEventListener('click', function() {
+        showFrcTeams(frcInfo, toggleTeams);
+        if ( toggleTeams == true ) {
+            toggleTeams = false;
+        } else {
+            toggleTeams = true;
+        }
+    });
+    document.getElementById('show_events').addEventListener('click', function() {
+        showFrcEvents(frcInfo, toggleEvents);
+        if ( toggleEvents == true ) {
+            toggleEvents = false;
+        } else {
+            toggleEvents = true;
+        }
+    });
   
-}
-
-var myMarker;
-
-function geocodeAddress(geocoder, resultsMap) {
-  var address = document.getElementById('address').value;
-  geocoder.geocode({'address': address}, function(results, status) {
-    if (status === 'OK') {
-      resultsMap.setCenter(results[0].geometry.location);
-
-      var image = './images/FIRST-logo-tiny.png';
-      var marker = new google.maps.Marker({
-        map: resultsMap,
-        position: results[0].geometry.location,
-        //icon: image
-      });
-      
-      myMarker = marker;
-      
-      var infoWindow = new google.maps.InfoWindow({
-          content: 'Hello, FRC1073!!!'
-      });
-
-      google.maps.event.addListener(myMarker, 'click', function () {
-            infoWindow.open(map, marker);
-      });
-      
-    } else {
-      alert('Geocode was not successful for the following reason: ' + status);
-    }
-  });
 }
 
 $(document).ready(function() {
 
-    // With JQuery
+    frcInfo = new FrcData();
+
+    frcInfo.loadTeamData();
+    frcInfo.loadEventData();
+
+    // example on how to get the list of teams for a particular year
+    var teamList = frcInfo.getTeamListByYear( 2003 );
+
+    // initialize the slider callback function
     $("#slider").slider();
     $("#slider").on("slide", function(slideEvt) {
         $("#sliderSliderVal").text(slideEvt.value);
+
+        // call the slider event handler, passing in the current FRC info
+        mapSliderEvent( frcInfo, slideEvt.value );
     });
 });
 
@@ -119,10 +132,10 @@ $(document).ready(function() {
 <body>
 
     <div id="floating-panel">
-      <input id="address" type="textbox" value="Hollis, NH">
-      <input id="submit" type="button" value="Geocode">
-      <input id="submit2" type="button" value="Hide">
-      <input id="submit3" type="button" value="Show">
+      <input id="entity" type="textbox" value="">
+      <input id="find_entity" type="button" value="Find">
+      <input id="show_teams" type="button" value="Teams">
+      <input id="show_events" type="button" value="Events">
     </div>
     <div id="map"></div>
 
