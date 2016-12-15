@@ -15,6 +15,7 @@ function mapLocation(entity, geocoder, resultsMap) {
         if (status === 'OK') {
             resultsMap.setCenter(results[0].geometry.location);
 
+            var image = './images/FIRST-logo-tiny.png';
             var marker = new google.maps.Marker({
                                             map: resultsMap,
                                             position: results[0].geometry.location,

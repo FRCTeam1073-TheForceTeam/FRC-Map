@@ -144,9 +144,14 @@ function loadTeamDummyData( teamInfo, teamList, yearInfo ) {
 }
 
 
-function loadTeamDataFromTba( teamInfo, yearInfo ) {
+function loadTeamDataFromTba( teamInfo, teamList, yearInfo ) {
 
 
+}
+
+function loadEventData( eventInfo, eventList, yearInfo ) {
+	
+	
 }
 
 

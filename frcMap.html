@@ -110,12 +110,15 @@ $(document).ready(function() {
     frcInfo.loadTeamData();
     frcInfo.loadEventData();
 
-    // example on how to get the list of teams for a particular year
-    var teamList = frcInfo.getTeamListByYear( 2003 );
-
     // initialize the slider callback function
     $("#slider").slider();
     $("#slider").on("slide", function(slideEvt) {
+        $("#sliderSliderVal").text(slideEvt.value);
+
+        // call the slider event handler, passing in the current FRC info
+        mapSliderEvent( frcInfo, slideEvt.value );
+    });
+    $("#slider").on("slideStop", function(slideEvt) {
         $("#sliderSliderVal").text(slideEvt.value);
 
         // call the slider event handler, passing in the current FRC info
