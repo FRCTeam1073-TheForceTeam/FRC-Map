@@ -81,11 +81,15 @@ function YearInfo(startYear,currentYear) {
     this.getEvents = function(year) { return this.events[year-this.startYear]; }
 }
 
+function Entity(entity_type) {
+	this.type = entity_type;
+	this.getType = function() { return this.type; }
+}
 
 function loadTeamDummyData( teamInfo, teamList, yearInfo ) {
 
     // Create Team 1073 data from TBA dataset
-    var team = new Object();
+    var team = new Entity('TEAM');
 
     team.website = "http://www.theforceteam.com";
     team.name = "UTC / Waters Corporation / Parker Hannifin & Hollis-Brookline High School";
@@ -99,12 +103,13 @@ function loadTeamDummyData( teamInfo, teamList, yearInfo ) {
     team.motto = "Sanity is Optional";
     team.nickname = "The Force Team";
 
+    team.entity_type = 'TEAM';
     teamInfo[team.key] = team;
     teamList.push(team.team_number.toString());
     yearInfo.addTeam(team.rookie_year, team.team_number);
 
     // Create Team 1058 from TBA dataset
-    team = new Object();
+    var team = new Entity('TEAM');
 
     team.website = "http://team1058.com/";
     team.name = "Fleet Ready Corp. / BAE Systems / Show Ready Events / Dumpster Depot / JMD Industries / Veloxion / Willseal & Londonderry Senior High School";
@@ -118,12 +123,13 @@ function loadTeamDummyData( teamInfo, teamList, yearInfo ) {
     team.motto = "You can't stop Team 1058";
     team.nickname = "PVC Pirates";
 
+    team.entity_type = 'TEAM';
     teamInfo[team.key] = team;
     teamList.push(team.team_number.toString());
     yearInfo.addTeam(team.rookie_year, team.team_number);
 
     // Create Team 1706 from TBA dataset
-    team = new Object();
+    var team = new Entity('TEAM');
 
     team.website = "http://www.ratchetrockers1706.org";
     team.name = "The Boeing Company / Planet Tool / Henry Jubel Foundation(Spartan Light Metals) / NVIDIA & Holt, Timberland and Liberty High Schools in the Wentzville School District";
@@ -157,7 +163,7 @@ function loadEventData( eventInfo, eventList, yearInfo ) {
 
 function loadEventDummyData( eventInfo, eventList, yearInfo ) {
 
-    event = new Object();
+    event = new Entity('EVENT');
 
     // Boston District Event
     event.key = "2016mabos";
@@ -183,7 +189,7 @@ function loadEventDummyData( eventInfo, eventList, yearInfo ) {
     yearInfo.addEvent(event.year, event.key);
 
     
-    event = new Object();
+    event = new Entity('EVENT');
 
     // NH Granite State Regional
     event.key = "2010nh";
@@ -209,7 +215,7 @@ function loadEventDummyData( eventInfo, eventList, yearInfo ) {
     yearInfo.addEvent(event.year, event.key);
 
 
-    event = new Object();
+    event = new Entity('EVENT');
 
     event.key = "1998mi";
     event.website = null;
@@ -234,7 +240,7 @@ function loadEventDummyData( eventInfo, eventList, yearInfo ) {
     eventList.push(event.key);
     yearInfo.addEvent(event.year, event.key);
 
-    event = new Object();
+    event = new Entity('EVENT');
 
     event.key = "2013cmp";
     event.website = "http://www.usfirst.org/roboticsprograms/frc/championship-event";
