@@ -156,12 +156,34 @@ function loadTeamDataFromTba( teamInfo, teamList, yearInfo ) {
 }
 
 function loadEventData( eventInfo, eventList, yearInfo ) {
-	
+for (i = 1992; i < 2017; i++) {
+var url = "https://www.thebluealliance.com/api/v2/events/"+ i.toString() + "?X-TBA-App-Id=frc1073:scouting-system:v02";
+var jqxhr = $.getJSON( url ,function(json_data) {
+       // upon success the variable json_data will contain the parsed
+       // JSON body of the response
+       console.log("Success. Yay!");
+for (j = 0; j < json_data.length;j++){
+var event = json_data[j];
+console.log("Success. Yay!");
+eventInfo[event.key] = event;
+    eventList.push(event.key);
+    yearInfo.addEvent(event.year, event.key);
+}
+
+
+}).error( function(jqXHR, textStatus, errorThrown) {
+       // upon error, this section can be used to handle the error. Here, I just
+       // printed the error log message to the console for debugging
+       console.log("Error: " + textStatus);
+       console.log("incoming text: " + jqXHR.responseText);
+});
+	}
 	
 }
 
 
 function loadEventDummyData( eventInfo, eventList, yearInfo ) {
+loadEventData( eventInfo, eventList, yearInfo );
 
     event = new Entity('EVENT');
 
