@@ -164,14 +164,15 @@ var jqxhr = $.getJSON( url ,function(json_data) {
        console.log("Success. Yay!");
 for (j = 0; j < json_data.length;j++){
 var event = json_data[j];
-console.log("Success. Yay!");
+    event.getType = function() { return 'EVENT'; }
 eventInfo[event.key] = event;
     eventList.push(event.key);
     yearInfo.addEvent(event.year, event.key);
 }
 
 
-}).error( function(jqXHR, textStatus, errorThrown) {
+})
+ .error( function(jqXHR, textStatus, errorThrown) {
        // upon error, this section can be used to handle the error. Here, I just
        // printed the error log message to the console for debugging
        console.log("Error: " + textStatus);
@@ -183,7 +184,10 @@ eventInfo[event.key] = event;
 
 
 function loadEventDummyData( eventInfo, eventList, yearInfo ) {
-loadEventData( eventInfo, eventList, yearInfo );
+
+    // commented out the line to load all the event data temporarily due to the
+    // quota limit issue with Google Maps - ksthilaire 12/16/16
+    //loadEventData( eventInfo, eventList, yearInfo );
 
     event = new Entity('EVENT');
 
