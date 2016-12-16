@@ -27,6 +27,7 @@ function mapLocation(entity, geocoder, resultsMap) {
             
             if (entityType = "TEAM") {
 				            
+            }
 
             var infoWindow = new google.maps.InfoWindow({
                                             content: 'Hello ' + entity.key
@@ -39,9 +40,10 @@ function mapLocation(entity, geocoder, resultsMap) {
             entity.marker = marker;
             entity.geolocation = results[0].geometry.location;
 			entity.marker.setVisible(false);
+
 			
         } else {
-            alert('Geocode was not successful for the following reason: ' + status);
+            console.log('Geocode was not successful for the following reason: ' + status);
         }
     });
 }
