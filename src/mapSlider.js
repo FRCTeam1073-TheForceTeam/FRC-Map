@@ -9,8 +9,10 @@ function mapSliderEvent( frcInfo, newYear ) {
         // Loop through the teams and events and show or hide the teams as the year goes up or down
     	console.log('Sliding from year: ' + currentYear + ' to: ' + newYear);
     	if (event.year != currentYear) {
+            eventInfo.marker.setVisible(false);
         }
         else {
+        	eventInfo.marker.setVisible(true);
         }
     }
     
