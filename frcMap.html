@@ -41,12 +41,15 @@
     }
 
     .slider-example {
-        margin: auto;
-        margin-left: 200px;
+      position: absolute;
+      top: 60px;
+      left: 25%;
+      z-index: 5;
+      margin: auto;
     }
 
     .slider.slider-horizontal {
-      width: 610px;
+      width: 400px;
       height: 20px;
     }
     .slider-value {
@@ -137,17 +140,19 @@ $(document).ready(function() {
 <body>
 
     <div id="floating-panel">
+      <input id="find_entity" type="button" value="Find Team">
       <input id="entity" type="textbox" value="">
-      <input id="find_entity" type="button" value="Find">
-      <input id="show_teams" type="button" value="Teams">
-      <input id="show_events" type="button" value="Events">
+      <input id="show_teams" type="checkbox" value="Teams"> Teams
+      <input id="show_events" type="checkbox" value="Events"> Events
     </div>
-    <div id="map"></div>
 
     <div class='slider-example'>
         <input id="slider" type="text" data-slider-min="1992" data-slider-max="2017" data-slider-step="1" data-slider-value="2017"/>
         <span class="slider-value" id="sliderCurrentSliderValLabel"> Year: <span id="sliderSliderVal">2017</span></span>
     </div>
+
+
+    <div id="map"></div>
 
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFv2an3D9y6JBSljMqZYS7e8vosnMmdMk&callback=initMap">
