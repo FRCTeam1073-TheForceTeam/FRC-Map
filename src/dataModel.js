@@ -4,6 +4,9 @@ function FrcData() {
     this.firstYear = 1992;
     this.lastYear = 2017;
     this.currentYear = 2017;
+    this.teamsLoaded = false;
+    this.eventsLoaded = false;
+    this.geoLoaded = false;
     this.teamData = new TeamInfo();
     this.eventData = new EventInfo();
     this.yearData = new YearInfo(this.firstYear,this.lastYear);
@@ -18,11 +21,13 @@ function FrcData() {
     this.getEventListByYear = function( year ) { return this.yearData.getEvents(year); }
     this.getEventList = function() { return this.eventData.getEventList(); }
 
-    this.loadTeamData = function() { this.teamData.loadData(this.yearData); }
-    this.loadEventData = function() { this.eventData.loadData(this.yearData); }
+    this.loadTeamData = function() { this.teamData.loadData(this); }
+    this.loadEventData = function() { this.eventData.loadData(this); }
 
+    // load the Geo locations from the local file 
+    this.geo_locations = JSON.parse(geo_coordinates_for_Events_Teams);
+    this.geoLoaded = true;
 }
-
 
 function TeamInfo() {
 
@@ -40,7 +45,7 @@ function TeamInfo() {
                             team = getTeam( teamNumber );
                             return team.marker;
                      }
-    this.loadData = function(yearData) { loadTeamDummyData(this.teamInfo, this.teamList, yearData); }
+    this.loadData = function(frcData) { loadTeamDummyData(this.teamInfo, this.teamList, frcData); }
 }
 
 
@@ -59,7 +64,7 @@ function EventInfo() {
                             event = getEvent( eventCode );
                             return event.marker;
                      }
-    this.loadData = function(yearData) { loadEventDummyData(this.eventInfo, this.eventList, yearData); }
+    this.loadData = function(frcData) { loadEventData(this.eventInfo, this.eventList, frcData); }
 }
 
 function YearInfo(startYear,currentYear) {
@@ -86,7 +91,9 @@ function Entity(entity_type) {
 	this.getType = function() { return this.type; }
 }
 
-function loadTeamDummyData( teamInfo, teamList, yearInfo ) {
+function loadTeamDummyData( teamInfo, teamList, frcInfo ) {
+
+    var yearInfo = frcInfo.yearData;
 
     // Create Team 1073 data from TBA dataset
     var team = new Entity('TEAM');
@@ -147,6 +154,7 @@ function loadTeamDummyData( teamInfo, teamList, yearInfo ) {
     teamList.push(team.team_number.toString());
     yearInfo.addTeam(team.rookie_year, team.team_number);
 
+    frcInfo.teamsLoaded = true;
 }
 
 
@@ -155,8 +163,11 @@ function loadTeamDataFromTba( teamInfo, teamList, yearInfo ) {
 
 }
 
-function loadEventData( eventInfo, eventList, yearInfo ) {
-for (i = 1992; i < 2017; i++) {
+function loadEventData( eventInfo, eventList, frcInfo ) {
+
+    var yearInfo = frcInfo.yearData;
+
+for (i = 1992; i <= 2017; i++) {
 var url = "https://www.thebluealliance.com/api/v2/events/"+ i.toString() + "?X-TBA-App-Id=frc1073:scouting-system:v02";
 var jqxhr = $.getJSON( url ,function(json_data) {
        // upon success the variable json_data will contain the parsed
@@ -170,6 +181,12 @@ eventInfo[event.key] = event;
     yearInfo.addEvent(event.year, event.key);
 }
 
+    // Cheesy way to determine that all the events have been loaded
+    // will want to come up with a better way...
+    if ( event.year == frcInfo.lastYear ) {
+        frcInfo.eventsLoaded = true;
+        console.log("All Events Loaded");
+    }
 
 })
  .error( function(jqXHR, textStatus, errorThrown) {
@@ -183,11 +200,9 @@ eventInfo[event.key] = event;
 }
 
 
-function loadEventDummyData( eventInfo, eventList, yearInfo ) {
+function loadEventDummyData( eventInfo, eventList, frcInfo ) {
 
-    // commented out the line to load all the event data temporarily due to the
-    // quota limit issue with Google Maps - ksthilaire 12/16/16
-    //loadEventData( eventInfo, eventList, yearInfo );
+    var yearInfo = frcInfo.yearData;
 
     event = new Entity('EVENT');
 
