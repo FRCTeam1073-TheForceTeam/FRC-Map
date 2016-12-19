@@ -1,0 +1,64 @@
+<html>
+<script src="./js/jquery.js"></script>
+<head>
+
+<style>
+.scroll
+{
+	position: relative;
+	top: 5%;
+    max-height: 60%;
+	width: 99%;
+    overflow-y: scroll;
+	border-style: solid;
+    border-width: 5px;
+	border-radius: 5px;
+}
+.team
+{
+	width: 100%;
+}
+.load
+{
+	width: 100%;
+}
+</style>
+</head>
+<body>
+<button class="load" onclick="getTeams()">Load Teams</button>
+<div class="scroll" id="myList">
+</div>
+<script>
+
+function getTeams(){
+	//blue alliance has multiple jsons for the lists of teams, currently they have 13
+	// if there is somehow we can get this through a request that would be better
+	for (var c = 0; c < 14; c++) { 
+		console.log(c);
+		loadTeams(c);
+		
+	}
+	
+}
+
+function loadTeams(page) {
+		
+			 var jqxhr = $.getJSON( "https://www.thebluealliance.com/api/v2/teams/"+page+"?X-TBA-App-Id=frc1073:scouting-system:v02", function(json_data) {
+			 console.log("Success");
+			 
+			 for ( var num = 0; num<json_data.length; num++ ) {
+			 
+				var node = document.createElement("form");
+				var node1 = document.createElement("input");
+				node1.type = "submit";
+				node1.value = json_data[num].nickname + "    -----    " + json_data[num].location;
+				node1.className= "team";
+				node.action= json_data[num].website;
+				node.appendChild(node1);
+				document.getElementById("myList").appendChild(node);
+		}
+	})
+	 
+}
+</script>
+</body>
