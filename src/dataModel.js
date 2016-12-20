@@ -158,9 +158,46 @@ function loadTeamDummyData( teamInfo, teamList, frcInfo ) {
 }
 
 
-function loadTeamDataFromTba( teamInfo, teamList, yearInfo ) {
+function loadTeamDataFromTba( teamInfo, teamList, yearInfo) {
 
+	
+	//If there is a way to see how many pages blue alliance has of teams, then replace 14 with that function
+	for (var page = 0; page<14; page++){
+	
+		// get request using jquery
+		var jqxhr = $.getJSON( "https://www.thebluealliance.com/api/v2/teams/"+page+"?X-TBA-App-Id=frc1073:scouting-system:v02", function(json_data) {
+			 console.log("Get Function Success for page " + page);
+			 
+			 var yearInfo = frcInfo.yearData;
+			 //getting every team per page
+			 for ( var num = 0; num<json_data.length; num++ ) {
+			 
+				var team = new Entity('TEAM');
+				
+				team.website = json_data[num].website;
+				team.name = json_data[num].name;
+				team.locality = json_data[num].locality;
+				team.rookie_year = json_data[num].rookie_year;
+				team.region = json_data[num].region;
+				team.team_number = json_data[num].team_number;
+				team.location = json_data[num].location;
+				team.key = json_data[num].key;
+				team.country_name = json_data[num].country_name;
+				team.motto = json_data[num].motto;
+				team.nickname = json_data[num].nickname;
 
+				team.entity_type = 'TEAM';
+				teamInfo[team.key] = team;
+				teamList.push(team.team_number.toString());
+				yearInfo.addTeam(team.rookie_year, team.team_number);
+			 
+			 }
+	}).error( function(jqXHR, textStatus, errorThrown) {
+		
+		//Error message for debugging
+});
+}
+	frcInfo.teamsLoaded = true;
 }
 
 function loadEventData( eventInfo, eventList, frcInfo ) {
