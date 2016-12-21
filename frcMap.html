@@ -55,6 +55,7 @@
     .slider-value {
         margin-left: 20px;
     }
+
 </style>
 
 
@@ -84,9 +85,23 @@ function initMap() {
     mapFrcEvents( frcInfo );
 
     document.getElementById('find_entity').addEventListener('click', function() {
-        var entityName = document.getElementById('entity').value;
+        var entityName = document.getElementById('entity_name').value;
 
         showFrcTeam( frcInfo, entityName );
+    });
+
+    document.getElementById('play_automation').addEventListener('click', function() {
+
+        console.log( "Playing Automation" );
+
+        // hide all events to start
+        showFrcEvents( frcInfo, false );
+
+        // start with showing the events of the first year
+        frcInfo.currentYear = frcInfo.firstYear;
+        
+        setTimeout(function(){ automation_callback(); },1000);
+
     });
 
     document.getElementById('show_teams').addEventListener('click', function() {
@@ -106,6 +121,28 @@ function initMap() {
         }
     });
   
+}
+
+function automation_callback() {
+
+    console.log( "Showing Events for year " + frcInfo.currentYear );
+
+    if ( frcInfo.currentYear != frcInfo.firstYear ) {
+        showFrcEventsByYear( frcInfo, (frcInfo.currentYear-1), false );
+    }
+
+    if ( toggleEvents == true )
+        showFrcEventsByYear( frcInfo, frcInfo.currentYear, true );
+
+    $("#sliderSliderVal").text(frcInfo.currentYear);
+    $("#slider").slider('setValue', frcInfo.currentYear);
+
+    frcInfo.currentYear += 1;
+
+    if ( frcInfo.currentYear <= frcInfo.lastYear ) {
+        setTimeout(function(){ automation_callback(); }, 500);
+    }
+
 }
 
 $(document).ready(function() {
@@ -139,9 +176,11 @@ $(document).ready(function() {
 
 <body>
 
+    
     <div id="floating-panel">
+      <input id="play_automation" type="button" value="Play" class="play-button">
       <input id="find_entity" type="button" value="Find Team">
-      <input id="entity" type="textbox" value="">
+      <input id="entity_name" type="textbox" value="" size="10">
       <input id="show_teams" type="checkbox" value="Teams"> Teams
       <input id="show_events" type="checkbox" value="Events"> Events
     </div>

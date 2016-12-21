@@ -19,6 +19,9 @@ function mapLocation(entity, frcInfo) {
                                         position: geo_location,
                                         //icon: image
                                     });
+    if ( !marker ) {
+        console.log( "Error creating marker for " + entity.key );        
+    }
 
     var infoString = "";
     var entityType = entity.getType();
@@ -109,19 +112,6 @@ function mapFrcEvents( frcInfo ) {
     }
 }
 
-function showFrcEvents(frcInfo, visible) {
-
-    var eventList = frcInfo.getEventList();
-
-    for ( i=0; i < eventList.length; i++  ) {
-        eventInfo = frcInfo.getEvent(eventList[i]);
-
-        if ( eventInfo.marker ) {
-            eventInfo.marker.setVisible(visible);
-        }
-    }
-}
-
 function showFrcTeam( frcInfo, teamNumber ) {
 
     var teamInfo = frcInfo.getTeam( teamNumber );
@@ -131,5 +121,33 @@ function showFrcTeam( frcInfo, teamNumber ) {
         frcInfo.map.setCenter( teamInfo.geolocation );    
     }
 
+}
+
+function showFrcEvents(frcInfo, visible) {
+
+    var eventList = frcInfo.getEventList();
+
+    for ( i=0; i < eventList.length; i++  ) {
+        eventInfo = frcInfo.getEvent(eventList[i]);
+
+        if ( eventInfo.marker ) {
+            eventInfo.marker.setVisible(visible);
+        } else {
+            console.log( "No marker for event: " + eventInfo.key );
+        }
+    }
+}
+
+function showFrcEventsByYear(frcInfo, year, visible) {
+
+    var eventList = frcInfo.getEventListByYear(year);
+
+    for ( i=0; i < eventList.length; i++  ) {
+        eventInfo = frcInfo.getEvent(eventList[i]);
+
+        if ( eventInfo.marker ) {
+            eventInfo.marker.setVisible(visible);
+        }
+    }
 }
 

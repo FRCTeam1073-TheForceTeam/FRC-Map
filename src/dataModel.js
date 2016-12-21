@@ -45,7 +45,7 @@ function TeamInfo() {
                             team = getTeam( teamNumber );
                             return team.marker;
                      }
-    this.loadData = function(frcData) { loadTeamDummyData(this.teamInfo, this.teamList, frcData); }
+    this.loadData = function(frcData) { loadTeamDataFromTba(this.teamInfo, this.teamList, frcData); }
 }
 
 
@@ -158,8 +158,9 @@ function loadTeamDummyData( teamInfo, teamList, frcInfo ) {
 }
 
 
-function loadTeamDataFromTba( teamInfo, teamList, yearInfo) {
+function loadTeamDataFromTba( teamInfo, teamList, frcInfo) {
 
+    var yearInfo = frcInfo.yearData;
 	
 	//If there is a way to see how many pages blue alliance has of teams, then replace 14 with that function
 	for (var page = 0; page<14; page++){
@@ -189,51 +190,64 @@ function loadTeamDataFromTba( teamInfo, teamList, yearInfo) {
 				team.entity_type = 'TEAM';
 				teamInfo[team.key] = team;
 				teamList.push(team.team_number.toString());
-				yearInfo.addTeam(team.rookie_year, team.team_number);
+
+                if ( team.rookie_year )
+				    yearInfo.addTeam(team.rookie_year, team.team_number);
 			 
 			 }
+
 	}).error( function(jqXHR, textStatus, errorThrown) {
 		
 		//Error message for debugging
 });
 }
-	frcInfo.teamsLoaded = true;
+
+    // Cheesy way to determine that all the teams have been loaded
+    // will want to come up with a better way...
+    console.log("Pausing to allow all teams to load...");
+    setTimeout(function(){ 
+                            frcInfo.teamsLoaded = true;
+                            console.log("Marking All Teams Loaded"); }, 4000);
+
 }
 
 function loadEventData( eventInfo, eventList, frcInfo ) {
+    loadEventYearData(eventInfo, eventList, frcInfo, frcInfo.firstYear);
+}
+
+function loadEventYearData( eventInfo, eventList, frcInfo, year ) {
 
     var yearInfo = frcInfo.yearData;
 
-for (i = 1992; i <= 2017; i++) {
-var url = "https://www.thebluealliance.com/api/v2/events/"+ i.toString() + "?X-TBA-App-Id=frc1073:scouting-system:v02";
-var jqxhr = $.getJSON( url ,function(json_data) {
-       // upon success the variable json_data will contain the parsed
-       // JSON body of the response
-       console.log("Success. Yay!");
-for (j = 0; j < json_data.length;j++){
-var event = json_data[j];
-    event.getType = function() { return 'EVENT'; }
-eventInfo[event.key] = event;
-    eventList.push(event.key);
-    yearInfo.addEvent(event.year, event.key);
-}
+    var url = "https://www.thebluealliance.com/api/v2/events/"+ year.toString() + "?X-TBA-App-Id=frc1073:scouting-system:v02";
+    var jqxhr = $.getJSON( url ,function(json_data) {
 
-    // Cheesy way to determine that all the events have been loaded
-    // will want to come up with a better way...
-    if ( event.year == frcInfo.lastYear ) {
-        frcInfo.eventsLoaded = true;
-        console.log("All Events Loaded");
-    }
+        // upon success the variable json_data will contain the parsed
+        // JSON body of the response
+        for (j = 0; j < json_data.length;j++){
+            var event = json_data[j];
+            event.getType = function() { return 'EVENT'; }
+            eventInfo[event.key] = event;
+            eventList.push(event.key);
+            yearInfo.addEvent(event.year, event.key);
+        }
 
-})
- .error( function(jqXHR, textStatus, errorThrown) {
+        // recursively call this function until we hit the last year
+        year += 1;
+        if ( year <= frcInfo.lastYear )
+            loadEventYearData(eventInfo, eventList, frcInfo, year);
+        else
+        {
+            frcInfo.eventsLoaded = true;
+            console.log("All Events Loaded!");
+        }
+    })
+    .error( function(jqXHR, textStatus, errorThrown) {
        // upon error, this section can be used to handle the error. Here, I just
        // printed the error log message to the console for debugging
        console.log("Error: " + textStatus);
        console.log("incoming text: " + jqXHR.responseText);
-});
-	}
-	
+    });
 }
 
 
