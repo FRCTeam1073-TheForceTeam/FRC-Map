@@ -27,6 +27,8 @@ function FrcData() {
     // load the Geo locations from the local file 
     this.geo_locations = JSON.parse(geo_coordinates_for_Events_Teams);
     this.geoLoaded = true;
+	
+	
 }
 
 function TeamInfo() {
@@ -157,50 +159,53 @@ function loadTeamDummyData( teamInfo, teamList, frcInfo ) {
     frcInfo.teamsLoaded = true;
 }
 
+function loadTeamDataFromTba( teamInfo, teamList, frcInfo){
+	
+	loadTeamDataFromPage( teamInfo, teamList, frcInfo, 0);
+}
 
-function loadTeamDataFromTba( teamInfo, teamList, frcInfo) {
+function loadTeamDataFromPage( teamInfo, teamList, frcInfo, page) {
 
     var yearInfo = frcInfo.yearData;
 	
-	//If there is a way to see how many pages blue alliance has of teams, then replace 14 with that function
-	for (var page = 0; page<14; page++){
 	
-		// get request using jquery
-		var jqxhr = $.getJSON( "https://www.thebluealliance.com/api/v2/teams/"+page+"?X-TBA-App-Id=frc1073:scouting-system:v02", function(json_data) {
-			 console.log("Get Function Success for page " + page);
+	
+	
+	// get request using jquery
+	var jqxhr = $.getJSON( "https://www.thebluealliance.com/api/v2/teams/"+page+"?X-TBA-App-Id=frc1073:scouting-system:v02", function(json_data) {
+		console.log("Get Function Success for page " + page);
 			 
-			 var yearInfo = frcInfo.yearData;
-			 //getting every team per page
-			 for ( var num = 0; num<json_data.length; num++ ) {
+		var yearInfo = frcInfo.yearData;
+		//getting every team per page
+		for ( var num = 0; num<json_data.length; num++ ) {
 			 
-				var team = new Entity('TEAM');
-				
-				team.website = json_data[num].website;
-				team.name = json_data[num].name;
-				team.locality = json_data[num].locality;
-				team.rookie_year = json_data[num].rookie_year;
-				team.region = json_data[num].region;
-				team.team_number = json_data[num].team_number;
-				team.location = json_data[num].location;
-				team.key = json_data[num].key;
-				team.country_name = json_data[num].country_name;
-				team.motto = json_data[num].motto;
-				team.nickname = json_data[num].nickname;
+		var team = json_data[num];
+		team.getType = function() { return 'TEAM'; }		
+		teamInfo[team.key] = team;
+		teamList.push(team.team_number.toString());
 
-				team.entity_type = 'TEAM';
-				teamInfo[team.key] = team;
-				teamList.push(team.team_number.toString());
-
-                if ( team.rookie_year )
-				    yearInfo.addTeam(team.rookie_year, team.team_number);
+		if ( team.rookie_year )
+			yearInfo.addTeam(team.rookie_year, team.team_number);
+		
+		}
 			 
-			 }
+			 // recursively call this function until we hit the last page
+			page += 1;
+			if (json_data.length != 0)
+				loadTeamDataFromPage( teamInfo, teamList, frcInfo, page);
+			else
+			{
+				frcInfo.teamsLoaded = true;
+				console.log("All Teams Loaded!");
+			}
+			 
+		
 
 	}).error( function(jqXHR, textStatus, errorThrown) {
 		
 		//Error message for debugging
 });
-}
+
 
     // Cheesy way to determine that all the teams have been loaded
     // will want to come up with a better way...
