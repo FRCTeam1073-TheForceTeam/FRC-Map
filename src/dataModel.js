@@ -14,6 +14,7 @@ function FrcData() {
     this.getTeam = function( teamNumber ) { return this.teamData.getTeam( teamNumber ); }
     this.getTeamMarker = function( teamNumber ) { return this.teamData.getMarker( teamNumber ); }
     this.getTeamListByYear = function( year ) { return this.yearData.getTeams(year); }
+    this.getTeamEndListByYear = function( year ) { return this.yearData.getTeamsEnd(year); }
     this.getTeamList = function() { return this.teamData.getTeamList(); }
 
     this.getEvent = function( eventCode ) { return this.eventData.getEvent( eventCode ); }
@@ -27,8 +28,11 @@ function FrcData() {
     // load the Geo locations from the local file 
     this.geo_locations = JSON.parse(geo_coordinates_for_Events_Teams);
     this.geoLoaded = true;
-	
-	
+
+    // load the team participation information from the local file
+    this.team_participation = JSON.parse(team_participation);
+    this.participatedLoaded = true;
+    
 }
 
 function TeamInfo() {
@@ -73,24 +77,36 @@ function YearInfo(startYear,currentYear) {
     this.startYear = startYear;
     this.currentYear = currentYear;
 
+    // list of teams that first started competing in a given year
     this.teams = [];
+
+    // list of teams that last competed in a given year
+    this.teamsEnd = [];
+
+    // list of events for a given year
     this.events = [];
+
+    // initialize each of the lists of lists for each year
     for (var i=0; i<=(currentYear-startYear); i++) {
         this.teams[i] = [];
+        this.teamsEnd[i] = [];
         this.events[i] = [];
     }
 
     this.addTeam = function(year,team_number) {
                             this.teams[year-this.startYear].push(team_number.toString()); }
+    this.addTeamEnd = function(year,team_number) {
+                            this.teamsEnd[year-this.startYear].push(team_number.toString()); }
     this.addEvent = function(year,eventCode) {
                             this.events[year-this.startYear].push(eventCode); }
     this.getTeams = function(year) { return this.teams[year-this.startYear]; }
+    this.getTeamsEnd = function(year) { return this.teamsEnd[year-this.startYear]; }
     this.getEvents = function(year) { return this.events[year-this.startYear]; }
 }
 
 function Entity(entity_type) {
-	this.type = entity_type;
-	this.getType = function() { return this.type; }
+    this.type = entity_type;
+    this.getType = function() { return this.type; }
 }
 
 function loadTeamDummyData( teamInfo, teamList, frcInfo ) {
@@ -160,60 +176,58 @@ function loadTeamDummyData( teamInfo, teamList, frcInfo ) {
 }
 
 function loadTeamDataFromTba( teamInfo, teamList, frcInfo){
-	
-	loadTeamDataFromPage( teamInfo, teamList, frcInfo, 0);
+    
+    loadTeamDataFromPage( teamInfo, teamList, frcInfo, 0);
 }
 
 function loadTeamDataFromPage( teamInfo, teamList, frcInfo, page) {
 
     var yearInfo = frcInfo.yearData;
-	
-	
-	
-	
-	// get request using jquery
-	var jqxhr = $.getJSON( "https://www.thebluealliance.com/api/v2/teams/"+page+"?X-TBA-App-Id=frc1073:scouting-system:v02", function(json_data) {
-		console.log("Get Function Success for page " + page);
-			 
-		var yearInfo = frcInfo.yearData;
-		//getting every team per page
-		for ( var num = 0; num<json_data.length; num++ ) {
-			 
-		var team = json_data[num];
-		team.getType = function() { return 'TEAM'; }		
-		teamInfo[team.key] = team;
-		teamList.push(team.team_number.toString());
+    var participationInfo = frcInfo.team_participation;
 
-		if ( team.rookie_year )
-			yearInfo.addTeam(team.rookie_year, team.team_number);
-		
-		}
-			 
-			 // recursively call this function until we hit the last page
-			page += 1;
-			if (json_data.length != 0)
-				loadTeamDataFromPage( teamInfo, teamList, frcInfo, page);
-			else
-			{
-				frcInfo.teamsLoaded = true;
-				console.log("All Teams Loaded!");
-			}
-			 
-		
+    // get request using jquery
+    var jqxhr = $.getJSON( "https://www.thebluealliance.com/api/v2/teams/"+page+"?X-TBA-App-Id=frc1073:scouting-system:v02", function(json_data) {
+        console.log("Get Function Success for page " + page);
+             
+        var yearInfo = frcInfo.yearData;
 
-	}).error( function(jqXHR, textStatus, errorThrown) {
-		
-		//Error message for debugging
-});
+        //getting every team per page
+        for ( var num = 0; num<json_data.length; num++ ) {
+             
+            var team = json_data[num];
+            team.getType = function() { return 'TEAM'; }        
+            teamInfo[team.key] = team;
+            teamList.push(team.team_number.toString());
 
+            // check if the team has any participation information and if so,
+            // add the team to the list when they started competing and to
+            // the list marking the last year of competition. Note that the
+            // last year may be the current year if the team is still competing
+            if ( participationInfo[team.key] ) {
+                firstYear = participationInfo[team.key].first_competed;
+                lastYear = participationInfo[team.key].last_competed;
 
-    // Cheesy way to determine that all the teams have been loaded
-    // will want to come up with a better way...
-    console.log("Pausing to allow all teams to load...");
-    setTimeout(function(){ 
-                            frcInfo.teamsLoaded = true;
-                            console.log("Marking All Teams Loaded"); }, 4000);
+                team.first_year = firstYear;
+                team.last_year = lastYear;
+                yearInfo.addTeam(firstYear, team.team_number);
+                yearInfo.addTeamEnd(lastYear, team.team_number);
+            }
+        }
 
+        // recursively call this function until we hit the last page
+        page += 1;
+        if (json_data.length != 0)
+            loadTeamDataFromPage( teamInfo, teamList, frcInfo, page);
+        else
+        {
+            frcInfo.teamsLoaded = true;
+            console.log("All Teams Loaded!");
+        }
+
+    }).error( function(jqXHR, textStatus, errorThrown) {
+        
+        //Error message for debugging
+    });
 }
 
 function loadEventData( eventInfo, eventList, frcInfo ) {

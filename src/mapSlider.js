@@ -60,6 +60,8 @@ function mapSliderEvent( frcInfo, newYear ) {
 		}
     }
     
+    }
+
     // Save the new year value as the current year
     frcInfo.currentYear = newYear;
 

@@ -7,6 +7,7 @@
 <script src="./js/modernizr.js"></script>
 
 <script src="./data/geo_coordinates_for_Events_Teams.js"></script>
+<script src="./data/team_participation.js"></script>
 
 <script src="./src/dataModel.js"></script>
 <script src="./src/mapInterface.js"></script>
@@ -139,7 +140,7 @@ function automation_callback() {
 
     frcInfo.currentYear += 1;
 
-    if ( frcInfo.currentYear <= frcInfo.lastYear ) {
+    if ( frcInfo.currentYear < frcInfo.lastYear ) {
         setTimeout(function(){ automation_callback(); }, 500);
     }
 
