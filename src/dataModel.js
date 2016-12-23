@@ -14,7 +14,6 @@ function FrcData() {
     this.getTeam = function( teamNumber ) { return this.teamData.getTeam( teamNumber ); }
     this.getTeamMarker = function( teamNumber ) { return this.teamData.getMarker( teamNumber ); }
     this.getTeamListByYear = function( year ) { return this.yearData.getTeams(year); }
-    this.getTeamEndListByYear = function( year ) { return this.yearData.getTeamsEnd(year); }
     this.getTeamList = function() { return this.teamData.getTeamList(); }
 
     this.getEvent = function( eventCode ) { return this.eventData.getEvent( eventCode ); }
@@ -28,15 +27,8 @@ function FrcData() {
     // load the Geo locations from the local file 
     this.geo_locations = JSON.parse(geo_coordinates_for_Events_Teams);
     this.geoLoaded = true;
-<<<<<<< HEAD
 	
 	
-=======
-
-    // load the team participation information from the local file
-    this.team_participation = JSON.parse(team_participation);
-    this.participatedLoaded = true;
->>>>>>> origin/master
 }
 
 function TeamInfo() {
@@ -81,30 +73,18 @@ function YearInfo(startYear,currentYear) {
     this.startYear = startYear;
     this.currentYear = currentYear;
 
-    // list of teams that first started competing in a given year
     this.teams = [];
-
-    // list of teams that last competed in a given year
-    this.teamsEnd = [];
-
-    // list of events for a given year
     this.events = [];
-
-    // initialize each of the lists of lists for each year
     for (var i=0; i<=(currentYear-startYear); i++) {
         this.teams[i] = [];
-        this.teamsEnd[i] = [];
         this.events[i] = [];
     }
 
     this.addTeam = function(year,team_number) {
                             this.teams[year-this.startYear].push(team_number.toString()); }
-    this.addTeamEnd = function(year,team_number) {
-                            this.teamsEnd[year-this.startYear].push(team_number.toString()); }
     this.addEvent = function(year,eventCode) {
                             this.events[year-this.startYear].push(eventCode); }
     this.getTeams = function(year) { return this.teams[year-this.startYear]; }
-    this.getTeamsEnd = function(year) { return this.teamsEnd[year-this.startYear]; }
     this.getEvents = function(year) { return this.events[year-this.startYear]; }
 }
 
@@ -195,7 +175,6 @@ function loadTeamDataFromPage( teamInfo, teamList, frcInfo, page) {
 	var jqxhr = $.getJSON( "https://www.thebluealliance.com/api/v2/teams/"+page+"?X-TBA-App-Id=frc1073:scouting-system:v02", function(json_data) {
 		console.log("Get Function Success for page " + page);
 			 
-<<<<<<< HEAD
 		var yearInfo = frcInfo.yearData;
 		//getting every team per page
 		for ( var num = 0; num<json_data.length; num++ ) {
@@ -221,46 +200,6 @@ function loadTeamDataFromPage( teamInfo, teamList, frcInfo, page) {
 			}
 			 
 		
-=======
-			 var yearInfo = frcInfo.yearData;
-			 var participationInfo = frcInfo.team_participation;
-
-			 //getting every team per page
-			 for ( var num = 0; num<json_data.length; num++ ) {
-			 
-				var team = new Entity('TEAM');
-				
-				team.website = json_data[num].website;
-				team.name = json_data[num].name;
-				team.locality = json_data[num].locality;
-				team.rookie_year = json_data[num].rookie_year;
-				team.region = json_data[num].region;
-				team.team_number = json_data[num].team_number;
-				team.location = json_data[num].location;
-				team.key = json_data[num].key;
-				team.country_name = json_data[num].country_name;
-				team.motto = json_data[num].motto;
-				team.nickname = json_data[num].nickname;
-
-				team.entity_type = 'TEAM';
-				teamInfo[team.key] = team;
-				teamList.push(team.team_number.toString());
-
-                // check if the team has any participation information and if so,
-                // add the team to the list when they started competing and to
-                // the list marking the last year of competition. Note that the
-                // last year may be the current year if the team is still competing
-                if ( participationInfo[team.key] ) {
-                    firstYear = participationInfo[team.key].first_competed;
-                    lastYear = participationInfo[team.key].last_competed;
-
-                    team.first_year = firstYear;
-                    team.last_year = lastYear;
-				    yearInfo.addTeam(firstYear, team.team_number);
-				    yearInfo.addTeamEnd(lastYear, team.team_number);
-                }
-			 }
->>>>>>> origin/master
 
 	}).error( function(jqXHR, textStatus, errorThrown) {
 		
