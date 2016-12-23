@@ -26,13 +26,20 @@ function mapLocation(entity, frcInfo) {
     var infoString = "";
     var entityType = entity.getType();
             
-    if (entityType = "TEAM") {
-				            
+    if (entityType == "TEAM") {
+			var infoWindow = new google.maps.InfoWindow({
+                                    content: 'Hello, we are <b>Team ' + entity.team_number + '</b>.<br>' + 'We are ' + entity.nickname + '.'
+                                });	            
     }
 
-    var infoWindow = new google.maps.InfoWindow({
-                                    content: 'Hello ' + entity.key
-                                });
+
+    if (entityType == "EVENT") {
+			var infoWindow = new google.maps.InfoWindow({
+                                    content: '<b>' + entity.name + '</b> is located in ' + entity.location + '.'
+
+                                });	            
+    }			
+
 
     google.maps.event.addListener(marker, 'click', function () {
                                     infoWindow.open(map, marker); });
