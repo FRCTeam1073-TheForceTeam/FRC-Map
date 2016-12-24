@@ -10,6 +10,7 @@ function FrcData() {
     this.teamsMapped = false;
     this.eventsLoaded = false;
     this.geoLoaded = false;
+    this.animationState = 'Initial';
     this.teamData = new TeamInfo();
     this.eventData = new EventInfo();
     this.yearData = new YearInfo(this.firstYear,this.lastYear);

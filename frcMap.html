@@ -104,19 +104,29 @@ function initMap() {
         showFrcTeam( frcInfo, entityName );
     });
 
-    document.getElementById('play_automation').addEventListener('click', function() {
+    document.getElementById('play_animation').addEventListener('click', function() {
+        var state = frcInfo.animationState;
 
-        console.log( "Playing Automation" );
+        if ( state == 'Playing' ) {
+            console.log( "Pausing Aniomation" );
+            frcInfo.animationState = 'Paused';
+        } else if ( state == 'Paused' ) {
+            console.log( "Resuming Aniomation" );
+            frcInfo.animationState = 'Playing';
+            setTimeout(function(){ animation_callback(); },0000);
+        } else {
+            console.log( "Playing Aniomation" );
+            frcInfo.animationState = 'Playing';
 
-        // hide all events to start
-        showFrcEvents( frcInfo, false );
-        showFrcTeams( frcInfo, false );
+            // hide all events to start
+            showFrcEvents( frcInfo, false );
+            showFrcTeams( frcInfo, false );
 
-        // start with showing the events of the first year
-        frcInfo.currentYear = frcInfo.firstYear;
+            // start with showing the events of the first year
+            frcInfo.currentYear = frcInfo.firstYear;
         
-        setTimeout(function(){ automation_callback(); },1000);
-
+            setTimeout(function(){ animation_callback(); },1000);
+        }
     });
 
     document.getElementById("show_teams").checked = frcInfo.showTeams;
@@ -136,7 +146,7 @@ function initMap() {
     });
 }
 
-function automation_callback() {
+function animation_callback() {
 
     var thisYear = frcInfo.currentYear;
 
@@ -164,9 +174,11 @@ function automation_callback() {
     thisYear += 1;
     if ( thisYear <= frcInfo.lastYear ) {
         frcInfo.currentYear = thisYear;
-        setTimeout(function(){ automation_callback(); }, 500);
+        if ( frcInfo.animationState == 'Playing' )
+            setTimeout(function(){ animation_callback(); }, 500);
+    } else {
+        frcInfo.animationState = 'Initial';
     }
-
 }
 
 function set_map_slider_value( year )
@@ -212,7 +224,7 @@ $(document).ready(function() {
 
     
     <div id="floating-panel">
-      <input id="play_automation" type="button" value="Play" class="play-button">
+      <input id="play_animation" type="button" value="Play" class="play-button">
       <input id="find_entity" type="button" value="Find Team">
       <input id="entity_name" type="textbox" value="" size="10">
       <input id="show_teams" type="checkbox" value="Teams"> Teams
