@@ -58,10 +58,12 @@ function mapLocation(entity, frcInfo) {
 //
 function mapFrcTeams( frcInfo ) {
 
-    if ( frcInfo.teamsLoaded == false || frcInfo.geoLoaded == false ) {
+    if ( frcInfo.teamsLoaded == false || frcInfo.geoLoaded == false || frcInfo.eventsLoaded == false ) {
         console.log( "Pausing 1 second for teams to load" );
         setTimeout(function(){ mapFrcTeams(frcInfo) }, 1000);
     } else {
+        set_spinner_message( "Generating FRC Map..." );
+
         var teamList = frcInfo.getTeamList();
 
         console.log( "Mapping FRC Teams" );
@@ -73,6 +75,7 @@ function mapFrcTeams( frcInfo ) {
             mapLocation( teamInfo, frcInfo );
         }
 
+        frcInfo.teamsMapped = true;
         console.log( "FRC Teams Mapped Successfully" );
     }
 }
@@ -98,9 +101,45 @@ function showFrcTeams(frcInfo, visible) {
     }
 }
 
+//
+// Function: showFrcTeamsByYear()
+//
+// This function will show or hide the markers for all the FRC teams that are competing
+// in the current year
+//
+function showFrcTeamsByYear(frcInfo, currentYear, visible) {
+
+    if ( visible == false ) {
+        // if told to hide teams, just hide all the teams regardless of year
+        showFrcTeams(frcInfo, false);
+    } else {
+
+        // otherwise, show all the teams that are competing this year
+
+        // display all the teams that have started competing this year
+        var teams = frcInfo.getTeamListByYear(currentYear);
+        for ( i=0; i<teams.length; i++ ) {
+            teamInfo = frcInfo.getTeam(teams[i]);
+            if ( teamInfo.marker )
+               teamInfo.marker.setVisible(true);
+        }
+
+        // and hide any teams that stopped competing this year, do this by looking up the
+        // list of teams that competed for the last time in the previous year
+        if ( currentYear > frcInfo.firstYear ) {
+            teams = frcInfo.getTeamEndListByYear(currentYear-1);
+            for ( i=0; i<teams.length; i++ ) {
+                teamInfo = frcInfo.getTeam(teams[i]);
+                if ( teamInfo.marker )
+                   teamInfo.marker.setVisible(false);
+            }
+        }
+    }
+}
+
 function mapFrcEvents( frcInfo ) {
 
-    if ( frcInfo.eventsLoaded == false || frcInfo.geoLoaded == false ) {
+    if ( frcInfo.eventsLoaded == false || frcInfo.geoLoaded == false || frcInfo.teamsMapped == false ) {
         console.log( "Pausing 1 second for events to load" );
         setTimeout(function(){ mapFrcEvents(frcInfo) }, 1000);
     } else {
@@ -116,6 +155,10 @@ function mapFrcEvents( frcInfo ) {
         }
 
         console.log( "FRC Events Mapped Successfully" );
+
+        set_spinner_message( "FRC Map Generated..." );
+        setTimeout(function(){ toggle_spinner(); }, 2000);
+        
     }
 }
 
@@ -147,13 +190,18 @@ function showFrcEvents(frcInfo, visible) {
 
 function showFrcEventsByYear(frcInfo, year, visible) {
 
-    var eventList = frcInfo.getEventListByYear(year);
+    if ( visible == false ) {
+        // if told to hide events, just hide all the events regardless of year
+        showFrcEvents(frcInfo, false);
+    } else {
+        var eventList = frcInfo.getEventListByYear(year);
 
-    for ( i=0; i < eventList.length; i++  ) {
-        eventInfo = frcInfo.getEvent(eventList[i]);
+        for ( i=0; i < eventList.length; i++  ) {
+            eventInfo = frcInfo.getEvent(eventList[i]);
 
-        if ( eventInfo.marker ) {
-            eventInfo.marker.setVisible(visible);
+            if ( eventInfo.marker ) {
+                eventInfo.marker.setVisible(visible);
+            }
         }
     }
 }

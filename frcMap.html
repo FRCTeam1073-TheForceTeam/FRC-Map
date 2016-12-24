@@ -3,15 +3,20 @@
 <link rel="stylesheet" href="./css/bootstrap-slider.css" type="text/css" media="screen" />
 
 <script src="./js/jquery.js"></script>
+<script src="./js/bootstrap.min.js"></script>
 <script src="./js/bootstrap-slider.js"></script>
 <script src="./js/modernizr.js"></script>
 
 <script src="./data/geo_coordinates_for_Events_Teams.js"></script>
 <script src="./data/team_participation.js"></script>
 
+
 <script src="./src/dataModel.js"></script>
 <script src="./src/mapInterface.js"></script>
 <script src="./src/mapSlider.js"></script>
+
+<script src="./js/spin.js"></script>
+<script src="./src/spinner.js"></script>
 
 <style>
 
@@ -64,14 +69,22 @@
 
 var frcInfo;
 
-var toggleTeams = true;
-var toggleEvents = true;
+function toggle_spinner() {
+
+    $('#loading_spinner').modal('toggle');
+}
+
+function set_spinner_message( message )
+{
+    $("#loading_message").text(message);
+}
+
 
 function initMap() {
 
     // create the map instance
     var map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 4,
+                zoom: 2,
                 center: {lat: 42.743, lng: -71.592}
             });
 
@@ -97,6 +110,7 @@ function initMap() {
 
         // hide all events to start
         showFrcEvents( frcInfo, false );
+        showFrcTeams( frcInfo, false );
 
         // start with showing the events of the first year
         frcInfo.currentYear = frcInfo.firstYear;
@@ -105,50 +119,68 @@ function initMap() {
 
     });
 
+    document.getElementById("show_teams").checked = frcInfo.showTeams;
     document.getElementById('show_teams').addEventListener('click', function() {
-        showFrcTeams(frcInfo, toggleTeams);
-        if ( toggleTeams == true ) {
-            toggleTeams = false;
-        } else {
-            toggleTeams = true;
-        }
+        var is_checked = document.getElementById("show_teams").checked;
+        showFrcTeamsByYear(frcInfo, frcInfo.currentYear, is_checked);
+
+        frcInfo.showTeams = is_checked;
     });
+
+    document.getElementById("show_events").checked = frcInfo.showEvents;
     document.getElementById('show_events').addEventListener('click', function() {
-        showFrcEvents(frcInfo, toggleEvents);
-        if ( toggleEvents == true ) {
-            toggleEvents = false;
-        } else {
-            toggleEvents = true;
-        }
+        var is_checked = document.getElementById("show_events").checked;
+        showFrcEventsByYear(frcInfo, frcInfo.currentYear, is_checked);
+
+        frcInfo.showEvents = is_checked;
     });
-  
 }
 
 function automation_callback() {
 
+    var thisYear = frcInfo.currentYear;
+
     console.log( "Showing Events for year " + frcInfo.currentYear );
 
-    if ( frcInfo.currentYear != frcInfo.firstYear ) {
-        showFrcEventsByYear( frcInfo, (frcInfo.currentYear-1), false );
+    set_map_slider_value( frcInfo.currentYear );
+
+    // animate the event display if the events checkbox is clicked
+    if ( frcInfo.showEvents == true ) {
+
+        // hide the events of the previous year
+        if ( frcInfo.currentYear != frcInfo.firstYear ) {
+            showFrcEventsByYear( frcInfo, (frcInfo.currentYear-1), false );
+        }
+
+        // and show the events of the current year
+        showFrcEventsByYear( frcInfo, frcInfo.currentYear, true );
     }
 
-    if ( toggleEvents == true )
-        showFrcEventsByYear( frcInfo, frcInfo.currentYear, true );
+    // animate the teams display if the events checkbox is clicked
+    if ( frcInfo.showTeams == true ) {
+        showFrcTeamsByYear( frcInfo, frcInfo.currentYear, true );
+    }
 
-    $("#sliderSliderVal").text(frcInfo.currentYear);
-    $("#slider").slider('setValue', frcInfo.currentYear);
-
-    frcInfo.currentYear += 1;
-
-    if ( frcInfo.currentYear < frcInfo.lastYear ) {
+    thisYear += 1;
+    if ( thisYear <= frcInfo.lastYear ) {
+        frcInfo.currentYear = thisYear;
         setTimeout(function(){ automation_callback(); }, 500);
     }
 
 }
 
+function set_map_slider_value( year )
+{
+    $("#sliderSliderVal").text(year);
+    $("#slider").slider('setValue', year);
+}
+
 $(document).ready(function() {
 
     frcInfo = new FrcData();
+
+    var spinner = loadSpinner();
+    toggle_spinner();
 
     frcInfo.loadTeamData();
     frcInfo.loadEventData();
@@ -167,6 +199,7 @@ $(document).ready(function() {
         // call the slider event handler, passing in the current FRC info
         mapSliderEvent( frcInfo, slideEvt.value );
     });
+
 });
 
 
@@ -187,16 +220,32 @@ $(document).ready(function() {
     </div>
 
     <div class='slider-example'>
-        <input id="slider" type="text" data-slider-min="1992" data-slider-max="2017" data-slider-step="1" data-slider-value="2017"/>
-        <span class="slider-value" id="sliderCurrentSliderValLabel"> Year: <span id="sliderSliderVal">2017</span></span>
+        <input id="slider" type="text" data-slider-min="1992" data-slider-max="2017" data-slider-step="1" data-slider-value="1992"/>
+        <span class="slider-value" id="sliderCurrentSliderValLabel"> Year: <span id="sliderSliderVal">1992</span></span>
     </div>
-
 
     <div id="map"></div>
 
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFv2an3D9y6JBSljMqZYS7e8vosnMmdMk&callback=initMap">
     </script>
+
+    <div id="loading_spinner" class="modal fade" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="text-align: center">
+                </div>
+                <div class="modal-body" >
+                    <div style="height:200px">
+                        <span id="spinner_center" style="position: absolute;display: block;top: 50%;left: 50%;"></span>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align: center">
+                    <h4><span id="loading_message">...</span></h4>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>

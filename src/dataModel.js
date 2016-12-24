@@ -3,8 +3,11 @@
 function FrcData() {
     this.firstYear = 1992;
     this.lastYear = 2017;
-    this.currentYear = 2017;
+    this.currentYear = this.firstYear;
+    this.showTeams = false;
+    this.showEvents = true;
     this.teamsLoaded = false;
+    this.teamsMapped = false;
     this.eventsLoaded = false;
     this.geoLoaded = false;
     this.teamData = new TeamInfo();
@@ -176,6 +179,8 @@ function loadTeamDummyData( teamInfo, teamList, frcInfo ) {
 }
 
 function loadTeamDataFromTba( teamInfo, teamList, frcInfo){
+
+    set_spinner_message( "Loading FRC Team And Event Data..." );
     
     loadTeamDataFromPage( teamInfo, teamList, frcInfo, 0);
 }
@@ -231,6 +236,7 @@ function loadTeamDataFromPage( teamInfo, teamList, frcInfo, page) {
 }
 
 function loadEventData( eventInfo, eventList, frcInfo ) {
+
     loadEventYearData(eventInfo, eventList, frcInfo, frcInfo.firstYear);
 }
 
@@ -259,6 +265,7 @@ function loadEventYearData( eventInfo, eventList, frcInfo, year ) {
         {
             frcInfo.eventsLoaded = true;
             console.log("All Events Loaded!");
+            set_spinner_message( "Generating FRC Map..." );
         }
     })
     .error( function(jqXHR, textStatus, errorThrown) {
