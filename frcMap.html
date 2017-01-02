@@ -35,7 +35,13 @@
     #floating-panel {
       position: absolute;
       top: 10px;
-      left: 25%;
+
+      left: 0;
+      right: 0;
+      margin: auto;
+      width: 410px;
+      //left: 25%;
+
       z-index: 5;
       background-color: #fff;
       padding: 5px;
@@ -46,20 +52,41 @@
       padding-left: 10px;
     }
 
-    .slider-example {
+    .slider-panel {
       position: absolute;
       top: 60px;
-      left: 25%;
+      //left: 25%;
+
+      left: 0;
+      right: 0;
+      margin: auto;
+
       z-index: 5;
       margin: auto;
+      width: 550px;
     }
 
-    .slider.slider-horizontal {
-      width: 400px;
-      height: 20px;
-    }
     .slider-value {
-        margin-left: 20px;
+        margin-left: 50px;
+    }
+
+    .play-button {
+      width: 65px;
+    }
+
+    .acknowledgements {
+        width: 500px;
+        position: absolute;
+        bottom: 30;
+        left: 0;
+        right: 0;
+        margin: auto;
+        z-index: 5;
+    }
+
+    .centered {
+        text-align: center;
+        font-size: 75%;
     }
 
 </style>
@@ -108,15 +135,18 @@ function initMap() {
         var state = frcInfo.animationState;
 
         if ( state == 'Playing' ) {
-            console.log( "Pausing Aniomation" );
+            console.log( "Pausing Animation" );
             frcInfo.animationState = 'Paused';
+            document.getElementById('play_animation').value = 'Play ';
         } else if ( state == 'Paused' ) {
-            console.log( "Resuming Aniomation" );
+            console.log( "Resuming Animation" );
             frcInfo.animationState = 'Playing';
+            document.getElementById('play_animation').value = 'Pause';
             setTimeout(function(){ animation_callback(); },0000);
         } else {
-            console.log( "Playing Aniomation" );
+            console.log( "Playing Animation" );
             frcInfo.animationState = 'Playing';
+            document.getElementById('play_animation').value = 'Pause';
 
             // hide all events to start
             showFrcEvents( frcInfo, false );
@@ -132,7 +162,7 @@ function initMap() {
     document.getElementById("show_teams").checked = frcInfo.showTeams;
     document.getElementById('show_teams').addEventListener('click', function() {
         var is_checked = document.getElementById("show_teams").checked;
-        showFrcTeamsByYear(frcInfo, frcInfo.currentYear, is_checked);
+        showFrcTeamsByYearRange(frcInfo, frcInfo.firstYear, frcInfo.currentYear, is_checked);
 
         frcInfo.showTeams = is_checked;
     });
@@ -178,6 +208,7 @@ function animation_callback() {
             setTimeout(function(){ animation_callback(); }, 500);
     } else {
         frcInfo.animationState = 'Initial';
+        document.getElementById('play_animation').value = 'Play ';
     }
 }
 
@@ -224,14 +255,14 @@ $(document).ready(function() {
 
     
     <div id="floating-panel">
-      <input id="play_animation" type="button" value="Play" class="play-button">
+      <input id="play_animation" type="button" value="Play " class="play-button">
       <input id="find_entity" type="button" value="Find Team">
       <input id="entity_name" type="textbox" value="" size="10">
       <input id="show_teams" type="checkbox" value="Teams"> Teams
       <input id="show_events" type="checkbox" value="Events"> Events
     </div>
 
-    <div class='slider-example'>
+    <div class='slider-panel'>
         <input id="slider" type="text" data-slider-min="1992" data-slider-max="2017" data-slider-step="1" data-slider-value="1992"/>
         <span class="slider-value" id="sliderCurrentSliderValLabel"> Year: <span id="sliderSliderVal">1992</span></span>
     </div>
@@ -257,6 +288,12 @@ $(document).ready(function() {
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="acknowledgements">
+        <!--<div class="centered">2017 FRC Map graciously prepared by <a href="http://www.theforceteam.com">FRC Team 1073 - The Force Team</a></div>-->
+        <div class="centered">2017 FRC Map graciously prepared by FRC Team 1073 - The Force Team</a></div>
+        <div class="centered">Team and Event data obtained using <a href="https://www.thebluealliance.com/apidocs">TheBlueAlliance API</a></div>
     </div>
 
 </body>
