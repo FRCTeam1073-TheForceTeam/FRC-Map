@@ -1,4 +1,55 @@
 
+function pinSymbol(color) {
+    return {
+        path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z M -2,-30 a 2,2 0 1,1 4,0 2,2 0 1,1 -4,0',
+        fillColor: color,
+        fillOpacity: 1,
+        strokeColor: '#000',
+        strokeWeight: 1,
+        scale: 1,
+   };
+}
+
+function getMarkerIcon(entity, frcInfo) {
+
+    var icon;
+    var entityType = entity.getType();
+
+    if (entityType == "TEAM") {
+        //icon = pinSymbol('#3366ff');
+        if ( entity.first_year == frcInfo.lastYear ) {
+            // rookie team, give them a light blue marker
+            icon = './images/ltblue-dot.png';
+        } else {
+            icon = './images/blue-dot.png';
+        }
+    } else if (entityType == 'EVENT') {
+        // for events, use a different color marker to designate
+        // regional, district, and championship events
+        if ( entity.event_type == 0 ) {
+            // regional event
+            //icon = pinSymbol('#d14747');
+            icon = './images/red-dot.png';
+        } else if ( entity.event_type == 1 || entity.event_type == 2 ) {
+            // district and district championship event
+            icon = './images/green-dot.png';
+        } else if ( entity.event_type == 3 || entity.event_type == 4 ) {
+            // championship events
+            icon = './images/yellow-dot.png';
+        } else if ( entity.event_type == 99 ) {
+            // offseason events
+            icon = './images/purple-dot.png';
+        } else {
+            // unknown type, make it orange
+            icon = './images/orange-dot.png';
+        }
+    } else {
+        icon = './images/orange-dot.png';
+    }
+
+    return icon;
+}
+
 //
 // Function: mapLocation()
 //
@@ -8,35 +59,49 @@
 // control
 function mapLocation(entity, frcInfo) {
 
+    var entityType = entity.getType();
+
     var geo_location = frcInfo.geo_locations[entity.key];
     var resultsMap = frcInfo.map;
 
     resultsMap.setCenter(geo_location);
 
-    var image = './images/FIRST-logo-tiny.png';
+    var icon = getMarkerIcon(entity, frcInfo);
+
     var marker = new google.maps.Marker({
                                         map: resultsMap,
                                         position: geo_location,
-                                        //icon: image
+                                        icon: icon
                                     });
     if ( !marker ) {
         console.log( "Error creating marker for " + entity.key );        
     }
 
     var infoString = "";
-    var entityType = entity.getType();
             
     if (entityType == "TEAM") {
+            var rookieStr = '';
+            if (entity.first_year == frcInfo.lastYear )
+                rookieStr = 'Rookie ';
+            var infoString = 'Hello, we are <b>' + rookieStr + 'Team ' + entity.team_number + '</b>.';
+            infoString += '<br>' + 'We are ' + entity.nickname + '.';
+            infoString += '<br>' + 'From ' + entity.location + '.';
+            if ( entity.website )
+                infoString += '<br>' + '<a href="' + entity.website + '">' + entity.website + '</a>';
+            infoString += '<br>Years competed: ' + entity.first_year + '-' + entity.last_year;
+
 			var infoWindow = new google.maps.InfoWindow({
-                                    content: 'Hello, we are <b>Team ' + entity.team_number + '</b>.<br>' + 'We are ' + entity.nickname + '.'
+                                    content: infoString
                                 });	            
     }
 
-
     if (entityType == "EVENT") {
+            var infoString = '<b>' + entity.year + ' ' + entity.name + '</b>';
+            infoString += '<br>Location: ' + entity.location;
+            infoString += '<br>Event date: ' + entity.start_date;
+            infoString += '<br>Event type: ' + entity.event_type_string;
 			var infoWindow = new google.maps.InfoWindow({
-                                    content: '<b>' + entity.name + '</b> is located in ' + entity.location + '.'
-
+                                    content: infoString
                                 });	            
     }			
 
@@ -69,7 +134,7 @@ function mapFrcTeams( frcInfo ) {
         console.log( "Mapping FRC Teams" );
 
         // loop through the entire list of teams and add a marker to the map for each team
-        for ( i=0; i < teamList.length; i++  ) {
+        for ( var i=0; i < teamList.length; i++  ) {
             teamInfo = frcInfo.getTeam(teamList[i]);
 
             mapLocation( teamInfo, frcInfo );
@@ -92,7 +157,7 @@ function showFrcTeams(frcInfo, visible) {
     var teamList = frcInfo.getTeamList();
 
     // loop through the entire list of teams and add a marker to the map for each team
-    for ( i=0; i < teamList.length; i++  ) {
+    for ( var i=0; i < teamList.length; i++  ) {
         teamInfo = frcInfo.getTeam(teamList[i]);
 
         if ( teamInfo.marker ) {
@@ -118,7 +183,7 @@ function showFrcTeamsByYear(frcInfo, currentYear, visible) {
 
         // display all the teams that have started competing this year
         var teams = frcInfo.getTeamListByYear(currentYear);
-        for ( i=0; i<teams.length; i++ ) {
+        for ( var i=0; i<teams.length; i++ ) {
             teamInfo = frcInfo.getTeam(teams[i]);
             if ( teamInfo.marker )
                teamInfo.marker.setVisible(true);
@@ -128,11 +193,24 @@ function showFrcTeamsByYear(frcInfo, currentYear, visible) {
         // list of teams that competed for the last time in the previous year
         if ( currentYear > frcInfo.firstYear ) {
             teams = frcInfo.getTeamEndListByYear(currentYear-1);
-            for ( i=0; i<teams.length; i++ ) {
+            for ( var i=0; i<teams.length; i++ ) {
                 teamInfo = frcInfo.getTeam(teams[i]);
                 if ( teamInfo.marker )
                    teamInfo.marker.setVisible(false);
             }
+        }
+    }
+}
+
+function showFrcTeamsByYearRange(frcInfo, firstYear, lastYear, visible) {
+    if ( visible == false ) {
+        // if told to hide teams, just hide all the teams regardless of year
+        showFrcTeams(frcInfo, false);
+    } else {
+        // else loop from the first year to the last year of the specified
+        // range and show those all appropriate teams
+        for ( var i=firstYear; i<=lastYear; i++ ) {
+            showFrcTeamsByYear(frcInfo, i, visible);
         }
     }
 }
@@ -148,7 +226,7 @@ function mapFrcEvents( frcInfo ) {
         console.log( "Mapping FRC Events" );
 
         // loop through the entire list of events and add a marker to the map for each event
-        for ( i=0; i < eventList.length; i++  ) {
+        for ( var i=0; i < eventList.length; i++  ) {
             eventInfo = frcInfo.getEvent(eventList[i]);
 
             mapLocation( eventInfo, frcInfo );
@@ -177,7 +255,7 @@ function showFrcEvents(frcInfo, visible) {
 
     var eventList = frcInfo.getEventList();
 
-    for ( i=0; i < eventList.length; i++  ) {
+    for ( var i=0; i < eventList.length; i++  ) {
         eventInfo = frcInfo.getEvent(eventList[i]);
 
         if ( eventInfo.marker ) {
