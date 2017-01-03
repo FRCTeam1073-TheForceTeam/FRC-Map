@@ -32,19 +32,19 @@ function getMarkerIcon(entity, frcInfo) {
             icon = './images/red-dot.png';
         } else if ( entity.event_type == 1 || entity.event_type == 2 ) {
             // district and district championship event
-            icon = './images/green-dot.png';
+            icon = './images/orange-dot.png';
         } else if ( entity.event_type == 3 || entity.event_type == 4 ) {
             // championship events
             icon = './images/yellow-dot.png';
-        } else if ( entity.event_type == 99 ) {
-            // offseason events
+        } else if ( entity.event_type == 99 || entity.event_type == 100 ) {
+            // offseason and preseason events
             icon = './images/purple-dot.png';
         } else {
-            // unknown type, make it orange
-            icon = './images/orange-dot.png';
+            // unknown type, make it green
+            icon = './images/green-dot.png';
         }
     } else {
-        icon = './images/orange-dot.png';
+        icon = './images/green-dot.png';
     }
 
     return icon;
