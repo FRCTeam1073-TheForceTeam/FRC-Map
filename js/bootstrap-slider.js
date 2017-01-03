@@ -466,7 +466,11 @@ const windowIsDefined = (typeof window === "object");
 				/* Create highlight range elements */
 				this.rangeHighlightElements = [];
 				if (Array.isArray(this.options.rangeHighlights) && this.options.rangeHighlights.length > 0) {
-					for (let j = 0; j < this.options.rangeHighlights.length; j++) {
+                                        // ksthilaire - 010216 - The Safari browser on an iPad didn't seem to like the 'let' syntax
+                                        // causing the slider to not load properly. So, I changed the 'let' to 'var' and things
+                                        // seem to work. Not the most elegant solution, but it seems to work for now.
+					//for (let j = 0; j < this.options.rangeHighlights.length; j++) {
+					for (var j = 0; j < this.options.rangeHighlights.length; j++) {
 
 						var rangeHighlightElement = document.createElement("div");
 						rangeHighlightElement.className = "slider-rangeHighlight slider-selection";
@@ -1179,7 +1183,11 @@ const windowIsDefined = (typeof window === "object");
 
 				/* Position highlight range elements */
 				if (this.rangeHighlightElements.length > 0 && Array.isArray(this.options.rangeHighlights) && this.options.rangeHighlights.length > 0) {
-					for (let i = 0; i < this.options.rangeHighlights.length; i++) {
+                                        // ksthilaire - 010216 - The Safari browser on an iPad didn't seem to like the 'let' syntax
+                                        // causing the slider to not load properly. So, I changed the 'let' to 'var' and things
+                                        // seem to work. Not the most elegant solution, but it seems to work for now.
+					//for (let i = 0; i < this.options.rangeHighlights.length; i++) {
+					for (var i = 0; i < this.options.rangeHighlights.length; i++) {
 						var startPercent = this._toPercentage(this.options.rangeHighlights[i].start);
 						var endPercent = this._toPercentage(this.options.rangeHighlights[i].end);
 
@@ -1192,12 +1200,18 @@ const windowIsDefined = (typeof window === "object");
 						var currentRange = this._createHighlightRange(startPercent, endPercent);
 
 						if (currentRange) {
+                                                        // ksthilaire - 01/02/16 - in order to get the slider working on all browsers,
+                                                        // including IE11, I had to comment out the following lines because the JavaScript 
+                                                        // parser on IE11 doesn't support the backtick syntax. Rather than finding a
+                                                        // workaround that would do the same thing, I just commented out the lines 
+                                                        // since the slider used for the map project doesn't seem to use this behavior of
+                                                        // the slider
 							if (this.options.orientation === 'vertical') {
-								this.rangeHighlightElements[i].style.top = `${currentRange.start}%`;
-								this.rangeHighlightElements[i].style.height = `${currentRange.size}%`;
+								//this.rangeHighlightElements[i].style.top = `${currentRange.start}%`;
+								//this.rangeHighlightElements[i].style.height = `${currentRange.size}%`;
 							} else {
-								this.rangeHighlightElements[i].style.left = `${currentRange.start}%`;
-								this.rangeHighlightElements[i].style.width = `${currentRange.size}%`;
+								//this.rangeHighlightElements[i].style.left = `${currentRange.start}%`;
+								//this.rangeHighlightElements[i].style.width = `${currentRange.size}%`;
 							}
 						} else {
 							this.rangeHighlightElements[i].style.display = "none";
@@ -1830,7 +1844,11 @@ const windowIsDefined = (typeof window === "object");
 
 		*********************************/
 		if($) {
-			let autoRegisterNamespace;
+                        // ksthilaire - 010216 - The Safari browser on an iPad didn't seem to like the 'let' syntax
+                        // causing the slider to not load properly. So, I changed the 'let' to 'var' and things
+                        // seem to work. Not the most elegant solution, but it seems to work for now.
+			//let autoRegisterNamespace;
+			var autoRegisterNamespace;
 
 			if (!$.fn.slider) {
 				$.bridget(NAMESPACE_MAIN, Slider);
