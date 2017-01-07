@@ -18,27 +18,30 @@ function getMarkerIcon(entity, frcInfo) {
     if (entityType == "TEAM") {
         //icon = pinSymbol('#3366ff');
         if ( entity.first_year == frcInfo.lastYear ) {
-            // rookie team, give them a light blue marker
-            icon = './images/ltblue-dot.png';
+            // rookie team
+            icon = './images/rookie-pin.png';
         } else {
-            icon = './images/blue-dot.png';
+        	// if the team isn't a rookie team, i.e. veteran team
+            icon = './images/team-pin.png';
         }
     } else if (entityType == 'EVENT') {
         // for events, use a different color marker to designate
         // regional, district, and championship events
         if ( entity.event_type == 0 ) {
             // regional event
-            //icon = pinSymbol('#d14747');
-            icon = './images/red-dot.png';
-        } else if ( entity.event_type == 1 || entity.event_type == 2 ) {
-            // district and district championship event
-            icon = './images/orange-dot.png';
+            icon = './images/regional-events.png';
+        } else if ( entity.event_type == 1 ) {
+            // district event
+            icon = './images/district-events.png';
+        } else if ( entity.event_type == 2 ) {
+        	// district championship
+        	icon = './images/district-champs.png';
         } else if ( entity.event_type == 3 || entity.event_type == 4 ) {
             // championship events
-            icon = './images/yellow-dot.png';
+            icon = './images/worlds-pin.png';
         } else if ( entity.event_type == 99 || entity.event_type == 100 ) {
             // offseason and preseason events
-            icon = './images/purple-dot.png';
+            icon = './images/offseason-events.png';
         } else {
             // unknown type, make it green
             icon = './images/green-dot.png';
