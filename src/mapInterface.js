@@ -19,29 +19,36 @@ function getMarkerIcon(entity, frcInfo) {
         //icon = pinSymbol('#3366ff');
         if ( entity.first_year == frcInfo.lastYear ) {
             // rookie team
-            icon = './images/rookie-pin.png';
+            //icon = './images/rookie-pin.png';
+            icon = './images/ltblue-dot.png';
         } else {
-        	// if the team isn't a rookie team, i.e. veteran team
-            icon = './images/team-pin.png';
+            // if the team isn't a rookie team, i.e. veteran team
+            //icon = './images/team-pin.png';
+            icon = './images/blue-dot.png';
         }
     } else if (entityType == 'EVENT') {
         // for events, use a different color marker to designate
         // regional, district, and championship events
         if ( entity.event_type == 0 ) {
             // regional event
-            icon = './images/regional-events.png';
+            //icon = './images/regional-events.png';
+            icon = './images/red-dot.png';
         } else if ( entity.event_type == 1 ) {
             // district event
-            icon = './images/district-events.png';
+            //icon = './images/district-events.png';
+            icon = './images/orange-dot.png';
         } else if ( entity.event_type == 2 ) {
-        	// district championship
-        	icon = './images/district-champs.png';
+            // district  championship event
+        	//icon = './images/district-champs.png';
+            icon = './images/orange-dot.png';
         } else if ( entity.event_type == 3 || entity.event_type == 4 ) {
             // championship events
-            icon = './images/worlds-pin.png';
+            //icon = './images/worlds-pin.png';
+            icon = './images/yellow-dot.png';
         } else if ( entity.event_type == 99 || entity.event_type == 100 ) {
             // offseason and preseason events
-            icon = './images/offseason-events.png';
+            //icon = './images/offseason-events.png';
+            icon = './images/purple-dot.png';
         } else {
             // unknown type, make it green
             icon = './images/green-dot.png';
