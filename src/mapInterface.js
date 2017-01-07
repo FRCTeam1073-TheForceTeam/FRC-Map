@@ -83,28 +83,22 @@ function mapLocation(entity, frcInfo) {
             var rookieStr = '';
             if (entity.first_year == frcInfo.lastYear )
                 rookieStr = 'Rookie ';
-            var infoString = 'Hello, we are <b>' + rookieStr + 'Team ' + entity.team_number + '</b>.';
+            infoString = 'Hello, we are <b>' + rookieStr + 'Team ' + entity.team_number + '</b>.';
             infoString += '<br>' + 'We are ' + entity.nickname + '.';
             infoString += '<br>' + 'From ' + entity.location + '.';
             if ( entity.website )
                 infoString += '<br>' + '<a href="' + entity.website + '">' + entity.website + '</a>';
             infoString += '<br>Years competed: ' + entity.first_year + '-' + entity.last_year;
-
-			var infoWindow = new google.maps.InfoWindow({
-                                    content: infoString
-                                });	            
     }
 
     if (entityType == "EVENT") {
-            var infoString = '<b>' + entity.year + ' ' + entity.name + '</b>';
+            infoString = '<b>' + entity.year + ' ' + entity.name + '</b>';
             infoString += '<br>Location: ' + entity.location;
             infoString += '<br>Event date: ' + entity.start_date;
             infoString += '<br>Event type: ' + entity.event_type_string;
-			var infoWindow = new google.maps.InfoWindow({
-                                    content: infoString
-                                });	            
     }			
 
+    var infoWindow = new google.maps.InfoWindow({ content: infoString });
 
     google.maps.event.addListener(marker, 'click', function () {
                                     infoWindow.open(map, marker); });
@@ -112,7 +106,8 @@ function mapLocation(entity, frcInfo) {
     entity.marker = marker;
     entity.geolocation = geo_location;
     entity.marker.setVisible(false);
-			
+    entity.infoWindow = infoWindow;
+
 }
 
 //
