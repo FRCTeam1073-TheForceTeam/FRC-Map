@@ -192,7 +192,7 @@ function loadTeamDataFromPage( teamInfo, teamList, frcInfo, page) {
     var participationInfo = frcInfo.team_participation;
 
     // get request using jquery
-    var jqxhr = $.getJSON( "https://www.thebluealliance.com/api/v2/teams/"+page+"?X-TBA-App-Id=frc1073:scouting-system:v02", function(json_data) {
+    var jqxhr = $.getJSON( "https://www.thebluealliance.com/api/v2/teams/"+page+"?X-TBA-App-Id=frc1073:frc-map:v01", function(json_data) {
         console.log("Get Function Success for page " + page);
              
         var yearInfo = frcInfo.yearData;
@@ -245,7 +245,7 @@ function loadEventYearData( eventInfo, eventList, frcInfo, year ) {
 
     var yearInfo = frcInfo.yearData;
 
-    var url = "https://www.thebluealliance.com/api/v2/events/"+ year.toString() + "?X-TBA-App-Id=frc1073:scouting-system:v02";
+    var url = "https://www.thebluealliance.com/api/v2/events/"+ year.toString() + "?X-TBA-App-Id=frc1073:frc-map:v01";
     var jqxhr = $.getJSON( url ,function(json_data) {
 
         // upon success the variable json_data will contain the parsed
