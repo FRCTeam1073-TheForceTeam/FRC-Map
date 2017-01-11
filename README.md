@@ -28,5 +28,13 @@ Additionally, team participation information was obtained from TheBlueAlliance, 
 program with the results captured as a JavaScript object in a file that is loaded at runtime. This was done by the 
 separate program to better organize the data in a form that the JavaScript expected.
 
+Using a URL query parameter, different marker pin types can be displayed. The default marker style are the
+Google Maps style markers, using different color markers for teams, rookie teams, and the different event types.
+When the marker query parameter is specified in the URL, custom markers are used. These markers use the
+parts of the FIRST logo (triangle, circle, square) in the marker design. Following is an example how to display
+the custom markers:
+
+                    http://<path>/FRC-Map/frcMap.html?marker=custom
+
 The map program, while fully functional, is not complete. We simply ran out of time to get it done before
 2017 kickoff. We plan to continue the development of the map and expand on the behavior.
