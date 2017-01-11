@@ -7,6 +7,7 @@
 <script src="./js/bootstrap.min.js"></script>
 <script src="./js/bootstrap-slider.js"></script>
 <script src="./js/modernizr.js"></script>
+<script src="./js/jquery.getParams.js"></script>
 
 <script src="./data/geo_coordinates_for_Events_Teams.js"></script>
 <script src="./data/team_participation.js"></script>
@@ -121,6 +122,19 @@ function initMap() {
     // store the map and geocoder in the overall data model object
     frcInfo.map = map;
     frcInfo.geocoder = geocoder;
+
+    // extract any query parameter for the marker style
+    // and use that to control how the map presents the 
+    // markers on the map. The custom marker style uses
+    // pieces of the FIRST logo (triangle, circle, square)
+    // for the marker style and the standard marker style
+    // uses the traditional google maps style marker pins
+    var markerStyle = $.getURLParam("marker"); 
+    if ( markerStyle != null )
+        frcInfo.markerStyle = markerStyle;
+    else
+        frcInfo.markerStyle = 'standard';
+    console.log( 'Marker Style: ' + frcInfo.markerStyle );
 
     // create all markers for the FRC teams and events 
     mapFrcTeams( frcInfo );
